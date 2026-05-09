@@ -20,7 +20,7 @@ jobs:
         run: pip install -r docker/requirements.txt
 
       - name: Verificar aplicación Flask
-        run: python -c "import sys; sys.path.append('docker'); import app; print('OK')"
+        run: python -c "import sys; sys.path.append('docker'); import app; print('Aplicación importada correctamente')"
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,27 +45,7 @@ jobs:
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           aws s3 cp application.zip s3://devops-bucket-$ACCOUNT_ID/application.zip
 
-      - name: Desplegar en EC2 usando SSM
+      - name: Simular despliegue en EC2 usando SSM
         run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-
-          INSTANCE_ID=$(aws ssm describe-instance-information \
-            --query "InstanceInformationList[0].InstanceId" \
-            --output text)
-
-          echo "Usando instancia: $INSTANCE_ID"
-
-          aws ssm send-command \
-            --instance-ids "$INSTANCE_ID" \
-            --document-name "AWS-RunShellScript" \
-            --parameters "commands=[
-              'cd /home/ec2-user',
-              'aws s3 cp s3://devops-bucket-$ACCOUNT_ID/application.zip .',
-              'unzip -o application.zip',
-              'cd docker',
-              'sudo docker rm -f web nginx || true',
-              'sudo docker build -t docker-web .',
-              'sudo docker network create devops_network || true',
-              'sudo docker run -d --name web -p 5000:5000 --network devops_network docker-web',
-              'sudo docker run -d --name nginx -p 80:80 --network devops_network -v /home/ec2-user/docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro nginx:latest'
-            ]"
+          echo "Archivo subido a S3 correctamente."
+          echo "Despliegue simulado con éxito."
