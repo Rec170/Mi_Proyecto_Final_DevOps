@@ -1,7 +1,15 @@
+# Python
 __pycache__/
 *.pyc
 venv/
-.aws/
-*.log
 .env
-.vscode/
+
+# AWS
+.aws/
+
+# Logs
+*.log
+
+# Docker
+*.tar
+docker-compose.override.yml
